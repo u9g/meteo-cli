@@ -1,9 +1,11 @@
 use itertools::Itertools;
+use sqlx::Row;
 use trustfall::provider::{ResolveInfo, VertexInfo, VertexIterator};
 
 use crate::adapter::{
     helpers::optim::{filter_down_candidate_value_of_float, filter_down_edge, SelectAndFilter},
     vertex::Datapoint,
+    Adapter,
 };
 
 use super::vertex::Vertex;
@@ -54,12 +56,21 @@ pub(super) fn datapoint<'a>(
         &mut select_and_filter,
     );
 
-    println!(
-        "select {} FROM {tower_name} tbl WHERE {}",
+    let query = format!(
+        "select {} FROM {tower_name} tbl LIMIT 1 WHERE {}",
         select_and_filter.select.iter().join(", "),
         select_and_filter.filter.join(" AND ")
     );
     // println!("wind_speed_meters_per_second outputted: {:#?}",);
+
+    let output = Adapter::runtime()
+        .block_on(sqlx::query(&query).fetch_one(Adapter::pool()))
+        .unwrap();
+
+    let value: f32 = output.try_get("airc").unwrap();
+
+    println!("{:#?}", value);
+
     let datapoints = vec![
         Datapoint::make("12-9-23".into(), 19.5, 25., 30.),
         Datapoint::make("10-10-22".into(), 17.32, -29., -35.),

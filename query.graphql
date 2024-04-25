@@ -3,25 +3,18 @@ query {
     time @output
     # wind_speed_meters_per_second @output
 
-    wind_speed {
-      meters_per_second @output @filter(op: "<", value: ["$a20"])
-    }
-    wind_speed {
-      x2: meters_per_second @output @filter(op: "one_of", value: ["$a19"])
-    }
+    # wind_speed {
+    #   meters_per_second @output @filter(op: "<", value: ["$a20"])
+    # }
+    # wind_speed {
+    #   x2: meters_per_second @output @filter(op: "one_of", value: ["$a19"])
+    # }
 
     temp {
-      celsius
+      fahrenheit
         @output
-        @filter(op: "<", value: ["$_19"])
-        @filter(op: ">", value: ["$_15"])
-    }
-
-    temp {
-      c2: fahrenheit
-        @output
-        @filter(op: "<", value: ["$_35"])
         @filter(op: ">", value: ["$_20"])
+        @filter(op: "<=", value: ["$_25"])
     }
   }
 }

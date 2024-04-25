@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 trustfall = "0.7.1"
 itertools = "0.12.1"
+dotenvy = "0.15"
+sqlx = { version = "0.7", features = [ "runtime-tokio", "mysql" ] }
+tokio = { version = "1.20.0", features = ["rt", "macros"]}

@@ -1,5 +1,8 @@
 use std::sync::{Arc, OnceLock};
 
+use sqlx::MySqlPool;
+use tokio::runtime::Runtime;
+
 use trustfall::{
     provider::{
         resolve_coercion_using_schema, resolve_property_with, AsVertex, ContextIterator,
@@ -12,6 +15,8 @@ use trustfall::{
 use super::vertex::Vertex;
 
 static SCHEMA: OnceLock<Schema> = OnceLock::new();
+static RUNTIME: OnceLock<Runtime> = OnceLock::new();
+static POOL: OnceLock<MySqlPool> = OnceLock::new();
 
 #[non_exhaustive]
 #[derive(Debug)]
@@ -26,6 +31,23 @@ impl Adapter {
 
     pub fn new() -> Self {
         Self {}
+    }
+
+    pub fn runtime() -> &'static Runtime {
+        RUNTIME.get_or_init(|| {
+            tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap()
+        })
+    }
+
+    pub fn pool() -> &'static MySqlPool {
+        POOL.get_or_init(|| {
+            Self::runtime()
+                .block_on(MySqlPool::connect(&dotenvy::var("DATABASE_URL").unwrap()))
+                .unwrap()
+        })
     }
 }
 

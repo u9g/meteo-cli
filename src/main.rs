@@ -13,15 +13,16 @@ fn main() {
     let query_results = execute_query(&schema, adapter, std::include_str!("../query.graphql"), {
         let mut args: BTreeMap<Arc<str>, FieldValue> = BTreeMap::new();
         // args.insert("wind_speed_filterer".into(), FieldValue::Float64(18.));
-        args.insert(
-            "a19".into(),
-            FieldValue::List(vec![FieldValue::Float64(9.), FieldValue::Float64(10.)].into()),
-        );
-        args.insert("a20".into(), FieldValue::Float64(9.5));
-        args.insert("_19".into(), FieldValue::Float64(19.));
-        args.insert("_15".into(), FieldValue::Float64(15.));
-        args.insert("_35".into(), FieldValue::Float64(35.));
+        // args.insert(
+        //     "a19".into(),
+        //     FieldValue::List(vec![FieldValue::Float64(9.), FieldValue::Float64(10.)].into()),
+        // );
+        // args.insert("a20".into(), FieldValue::Float64(9.5));
+        // args.insert("_19".into(), FieldValue::Float64(19.));
+        // args.insert("_15".into(), FieldValue::Float64(15.));
+        // args.insert("_35".into(), FieldValue::Float64(35.));
         args.insert("_20".into(), FieldValue::Float64(20.));
+        args.insert("_25".into(), FieldValue::Float64(25.));
         args
     });
 
