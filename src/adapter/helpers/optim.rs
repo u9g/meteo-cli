@@ -25,10 +25,7 @@ pub fn filter_down_candidate_value_of_float(
     candidate_value: CandidateValue<FieldValue>,
     select_and_filter: &mut SelectAndFilter,
     name_of_outputted_field: &str,
-    select_string: String,
 ) {
-    let select_string = select_string;
-
     match candidate_value {
         trustfall::provider::CandidateValue::Impossible => {}
         trustfall::provider::CandidateValue::Single(single) => {
@@ -36,7 +33,6 @@ pub fn filter_down_candidate_value_of_float(
             select_and_filter
                 .filter
                 .push(format!("{name_of_outputted_field} = {}", value_as_string));
-            select_and_filter.select.insert(select_string);
         }
         trustfall::provider::CandidateValue::Multiple(multiple) => {
             select_and_filter.filter.push(format!(
@@ -49,7 +45,6 @@ pub fn filter_down_candidate_value_of_float(
                     ))
                     .join(" OR ")
             ));
-            select_and_filter.select.insert(select_string);
         }
         trustfall::provider::CandidateValue::Range(range) => {
             // range.
@@ -75,11 +70,8 @@ pub fn filter_down_candidate_value_of_float(
                 )),
                 std::ops::Bound::Unbounded => {}
             }
-            select_and_filter.select.insert(select_string);
         }
-        trustfall::provider::CandidateValue::All => {
-            select_and_filter.select.insert(select_string);
-        }
+        trustfall::provider::CandidateValue::All => {}
         _ => todo!(),
     }
 }
