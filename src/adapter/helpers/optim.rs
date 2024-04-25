@@ -102,7 +102,9 @@ pub fn filter_down_edge(
             filter.push(format!("({})", x.filter.join(" AND ")));
         });
 
-    select_and_filter
-        .filter
-        .push(format!("({})", filter.join(" OR ")));
+    if !filter.is_empty() {
+        select_and_filter
+            .filter
+            .push(format!("({})", filter.join(" OR ")));
+    }
 }
