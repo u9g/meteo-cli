@@ -99,7 +99,9 @@ pub fn filter_down_edge(
         })
         .for_each(|x| {
             select_and_filter.select.extend(x.select);
-            filter.push(format!("({})", x.filter.join(" AND ")));
+            if !x.filter.is_empty() {
+                filter.push(format!("({})", x.filter.join(" AND ")));
+            }
         });
 
     if !filter.is_empty() {
