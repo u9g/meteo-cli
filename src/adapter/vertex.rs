@@ -24,16 +24,16 @@ impl Datapoint {
         temp_fahrenheit: f32,
     ) -> Self {
         Datapoint {
-            time,
-            wind_speed_meters_per_second,
-            temp: (Celsius(temp_celsius), Fahrenheit(temp_fahrenheit)),
+            time: Some(time),
+            wind_speed_meters_per_second: Some(wind_speed_meters_per_second),
+            temp: Some((Celsius(temp_celsius), Fahrenheit(temp_fahrenheit))),
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Datapoint {
-    pub time: String,
-    pub wind_speed_meters_per_second: f32,
-    pub temp: (Celsius, Fahrenheit),
+    pub time: Option<String>,
+    pub wind_speed_meters_per_second: Option<f32>,
+    pub temp: Option<(Celsius, Fahrenheit)>,
 }

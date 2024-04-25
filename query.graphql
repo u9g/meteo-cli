@@ -13,8 +13,8 @@ query {
     temp {
       fahrenheit
         @output
-        @filter(op: ">", value: ["$_20"])
-        @filter(op: "<=", value: ["$_25"])
+        @filter(op: ">", value: ["$_50"])
+        @filter(op: "<=", value: ["$_51"])
     }
   }
 }

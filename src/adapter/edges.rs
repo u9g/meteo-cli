@@ -38,7 +38,9 @@ mod datapoint {
             let vertex = vertex
                 .as_datapoint()
                 .expect("conversion failed, vertex was not a Datapoint");
-            Box::new(std::iter::once(Vertex::Temperature(vertex.temp.clone())))
+            Box::new(std::iter::once(Vertex::Temperature(
+                vertex.temp.as_ref().unwrap().clone(),
+            )))
         })
     }
     pub(super) fn wind_speed<'a, V: AsVertex<Vertex> + 'a>(
@@ -50,7 +52,7 @@ mod datapoint {
                 .as_datapoint()
                 .expect("conversion failed, vertex was not a Datapoint");
             Box::new(std::iter::once(Vertex::Speed(MetersPerSecond(
-                vertex.wind_speed_meters_per_second,
+                vertex.wind_speed_meters_per_second.unwrap(),
             ))))
         })
     }

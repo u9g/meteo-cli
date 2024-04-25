@@ -78,7 +78,7 @@ pub fn filter_down_candidate_value_of_float(
 
 pub fn filter_down_edge(
     edges: &mut dyn Iterator<Item = EdgeInfo>,
-    filter_down_values: fn(EdgeInfo, &mut SelectAndFilter),
+    filter_down_values: &mut impl FnMut(EdgeInfo, &mut SelectAndFilter),
     select_and_filter: &mut SelectAndFilter,
 ) {
     let mut filter = vec![];

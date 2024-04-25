@@ -21,8 +21,9 @@ fn main() {
         // args.insert("_19".into(), FieldValue::Float64(19.));
         // args.insert("_15".into(), FieldValue::Float64(15.));
         // args.insert("_35".into(), FieldValue::Float64(35.));
-        args.insert("_20".into(), FieldValue::Float64(20.));
-        args.insert("_25".into(), FieldValue::Float64(25.));
+        args.insert("_50".into(), FieldValue::Float64(50.));
+        args.insert("_51".into(), FieldValue::Float64(51.));
+        // args.insert("_25".into(), FieldValue::Float64(25.));
         args
     });
 
