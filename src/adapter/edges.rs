@@ -12,27 +12,7 @@ pub(super) fn resolve_tower_edge<'a, V: AsVertex<Vertex> + 'a>(
     resolve_info: &ResolveEdgeInfo,
 ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Vertex>> {
     match edge_name {
-        "Datapoints" => {
-            let interval_value: i64 = parameters
-                .get("interval_value")
-                .expect(
-                    "failed to find parameter 'interval_value' for edge 'Datapoints' on type 'Tower'",
-                )
-                .as_i64()
-                .expect(
-                    "unexpected null or other incorrect datatype for Trustfall type 'Int!'",
-                );
-            let interval_unit: &str = parameters
-                .get("interval_unit")
-                .expect(
-                    "failed to find parameter 'interval_unit' for edge 'Datapoints' on type 'Tower'",
-                )
-                .as_str()
-                .expect(
-                    "unexpected null or other incorrect datatype for Trustfall type 'String!'",
-                );
-            tower::datapoints(contexts, interval_value, interval_unit, resolve_info)
-        }
+        "datapoint" => tower::datapoint(contexts, resolve_info),
         _ => {
             unreachable!("attempted to resolve unexpected edge '{edge_name}' on type 'Tower'")
         }
@@ -47,10 +27,8 @@ mod tower {
 
     use super::super::vertex::Vertex;
 
-    pub(super) fn datapoints<'a, V: AsVertex<Vertex> + 'a>(
+    pub(super) fn datapoint<'a, V: AsVertex<Vertex> + 'a>(
         contexts: ContextIterator<'a, V>,
-        interval_value: i64,
-        interval_unit: &str,
         _resolve_info: &ResolveEdgeInfo,
     ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Vertex>> {
         resolve_neighbors_with::<Vertex, _>(contexts, move |vertex| {
@@ -59,12 +37,13 @@ mod tower {
                 .expect("conversion failed, vertex was not a Tower");
             Box::new(
                 vertex
-                    .tower_datapoints
-                    .clone()
+                    .datapoint
+                    .borrow_mut()
+                    .take()
+                    .unwrap()
                     .into_iter()
-                    .map(Vertex::Datapoint),
+                    .map(|x| Vertex::Datapoint(x)),
             )
-            // todo!("get neighbors along edge 'Datapoints' for type 'Tower'")
         })
     }
 }

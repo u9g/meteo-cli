@@ -70,7 +70,7 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
             return resolve_property_with(contexts, |vertex| vertex.typename().into());
         }
         match type_name.as_ref() {
-            "Datapoints" => super::properties::resolve_datapoints_property(
+            "Datapoint" => super::properties::resolve_datapoint_property(
                 contexts,
                 property_name.as_ref(),
                 resolve_info,
