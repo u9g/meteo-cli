@@ -14,17 +14,6 @@ pub(super) fn datapoint<'a>(
 ) -> VertexIterator<'a, Vertex> {
     let mut select_and_filter = SelectAndFilter::default();
 
-    if let Some(wind_speed_meters_per_second) =
-        resolve_info.statically_required_property("wind_speed_meters_per_second")
-    {
-        filter_down_candidate_value_of_float(
-            wind_speed_meters_per_second,
-            &mut select_and_filter,
-            "ws_2m_avg_hourly",
-            None,
-        );
-    }
-
     filter_down_edge(
         &mut resolve_info.edges_with_name("temp"),
         |edge, mut sf| {
@@ -34,7 +23,7 @@ pub(super) fn datapoint<'a>(
                     fahrenheit,
                     &mut sf,
                     "airc",
-                    Some("((tbl.airt_2m_avg - 32) * 5.0 / 9) as airc".to_owned()),
+                    "((tbl.airt_2m_avg - 32) * 5.0 / 9) as airc".to_owned(),
                 )
             }
             if let Some(celsius) = destination.statically_required_property("celsius") {
@@ -42,7 +31,23 @@ pub(super) fn datapoint<'a>(
                     celsius,
                     &mut sf,
                     "airt_2m_avg",
-                    Some("airt_2m_avg".to_owned()),
+                    "airt_2m_avg".to_owned(),
+                );
+            }
+        },
+        &mut select_and_filter,
+    );
+
+    filter_down_edge(
+        &mut resolve_info.edges_with_name("wind_speed"),
+        |edge, mut sf| {
+            let destination = edge.destination();
+            if let Some(celsius) = destination.statically_required_property("meters_per_second") {
+                filter_down_candidate_value_of_float(
+                    celsius,
+                    &mut sf,
+                    "ws_2m_avg",
+                    "ws_2m_avg".to_owned(),
                 );
             }
         },

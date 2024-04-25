@@ -13,6 +13,7 @@ pub(super) fn resolve_datapoint_edge<'a, V: AsVertex<Vertex> + 'a>(
 ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Vertex>> {
     match edge_name {
         "temp" => datapoint::temp(contexts, resolve_info),
+        "wind_speed" => datapoint::wind_speed(contexts, resolve_info),
         _ => {
             unreachable!("attempted to resolve unexpected edge '{edge_name}' on type 'Datapoint'")
         }
@@ -25,6 +26,8 @@ mod datapoint {
         VertexIterator,
     };
 
+    use crate::adapter::vertex::MetersPerSecond;
+
     use super::super::vertex::Vertex;
 
     pub(super) fn temp<'a, V: AsVertex<Vertex> + 'a>(
@@ -36,6 +39,19 @@ mod datapoint {
                 .as_datapoint()
                 .expect("conversion failed, vertex was not a Datapoint");
             Box::new(std::iter::once(Vertex::Temperature(vertex.temp.clone())))
+        })
+    }
+    pub(super) fn wind_speed<'a, V: AsVertex<Vertex> + 'a>(
+        contexts: ContextIterator<'a, V>,
+        _resolve_info: &ResolveEdgeInfo,
+    ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Vertex>> {
+        resolve_neighbors_with::<Vertex, _>(contexts, move |vertex| {
+            let vertex = vertex
+                .as_datapoint()
+                .expect("conversion failed, vertex was not a Datapoint");
+            Box::new(std::iter::once(Vertex::Speed(MetersPerSecond(
+                vertex.wind_speed_meters_per_second,
+            ))))
         })
     }
 }

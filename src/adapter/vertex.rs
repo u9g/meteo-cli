@@ -5,11 +5,15 @@ pub struct Celsius(pub f32);
 #[derive(Debug, Clone)]
 pub struct Fahrenheit(pub f32);
 
+#[derive(Debug, Clone)]
+pub struct MetersPerSecond(pub f32);
+
 #[non_exhaustive]
 #[derive(Debug, Clone, trustfall::provider::TrustfallEnumVertex)]
 pub enum Vertex {
     Datapoint(Datapoint),
     Temperature((Celsius, Fahrenheit)),
+    Speed(MetersPerSecond),
 }
 
 impl Datapoint {

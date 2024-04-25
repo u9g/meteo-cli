@@ -1,10 +1,15 @@
 query {
   Datapoint(tower_name: "CNT03") {
     time @output
-    wind_speed_meters_per_second
-      @output
-      @filter(op: "one_of", value: ["$a19"])
-      @filter(op: "<", value: ["$a20"])
+    # wind_speed_meters_per_second @output
+
+    wind_speed {
+      meters_per_second @output @filter(op: "<", value: ["$a20"])
+    }
+    wind_speed {
+      x2: meters_per_second @output @filter(op: "one_of", value: ["$a19"])
+    }
+
     temp {
       celsius
         @output

@@ -25,9 +25,9 @@ pub fn filter_down_candidate_value_of_float(
     candidate_value: CandidateValue<FieldValue>,
     select_and_filter: &mut SelectAndFilter,
     name_of_outputted_field: &str,
-    select_string: Option<String>,
+    select_string: String,
 ) {
-    let select_string = select_string.unwrap_or_else(|| name_of_outputted_field.to_owned());
+    let select_string = select_string;
 
     match candidate_value {
         trustfall::provider::CandidateValue::Impossible => {}

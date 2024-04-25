@@ -1,6 +1,13 @@
 use std::sync::{Arc, OnceLock};
 
-use trustfall::{FieldValue, Schema, provider::{AsVertex, ContextIterator, ContextOutcomeIterator, EdgeParameters, ResolveEdgeInfo, ResolveInfo, Typename, VertexIterator, resolve_coercion_using_schema, resolve_property_with}};
+use trustfall::{
+    provider::{
+        resolve_coercion_using_schema, resolve_property_with, AsVertex, ContextIterator,
+        ContextOutcomeIterator, EdgeParameters, ResolveEdgeInfo, ResolveInfo, Typename,
+        VertexIterator,
+    },
+    FieldValue, Schema,
+};
 
 use super::vertex::Vertex;
 
@@ -14,10 +21,7 @@ impl Adapter {
     pub const SCHEMA_TEXT: &'static str = include_str!("./schema.graphql");
 
     pub fn schema() -> &'static Schema {
-        SCHEMA
-            .get_or_init(|| {
-                Schema::parse(Self::SCHEMA_TEXT).expect("not a valid schema")
-            })
+        SCHEMA.get_or_init(|| Schema::parse(Self::SCHEMA_TEXT).expect("not a valid schema"))
     }
 
     pub fn new() -> Self {
@@ -66,20 +70,21 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
             return resolve_property_with(contexts, |vertex| vertex.typename().into());
         }
         match type_name.as_ref() {
-            "Datapoint" => {
-                super::properties::resolve_datapoint_property(
-                    contexts,
-                    property_name.as_ref(),
-                    resolve_info,
-                )
-            }
-            "Temperature" => {
-                super::properties::resolve_temperature_property(
-                    contexts,
-                    property_name.as_ref(),
-                    resolve_info,
-                )
-            }
+            "Datapoint" => super::properties::resolve_datapoint_property(
+                contexts,
+                property_name.as_ref(),
+                resolve_info,
+            ),
+            "Temperature" => super::properties::resolve_temperature_property(
+                contexts,
+                property_name.as_ref(),
+                resolve_info,
+            ),
+            "Speed" => super::properties::resolve_speed_property(
+                contexts,
+                property_name.as_ref(),
+                resolve_info,
+            ),
             _ => {
                 unreachable!(
                     "attempted to read property '{property_name}' on unexpected type: {type_name}"
@@ -97,14 +102,12 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
         resolve_info: &ResolveEdgeInfo,
     ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Self::Vertex>> {
         match type_name.as_ref() {
-            "Datapoint" => {
-                super::edges::resolve_datapoint_edge(
-                    contexts,
-                    edge_name.as_ref(),
-                    parameters,
-                    resolve_info,
-                )
-            }
+            "Datapoint" => super::edges::resolve_datapoint_edge(
+                contexts,
+                edge_name.as_ref(),
+                parameters,
+                resolve_info,
+            ),
             _ => {
                 unreachable!(
                     "attempted to resolve edge '{edge_name}' on unexpected type: {type_name}"

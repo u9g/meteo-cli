@@ -48,11 +48,15 @@ type RootSchemaQuery {
 
 type Datapoint {
   time: String!
-  wind_speed_meters_per_second: Float!
+  wind_speed: Speed!
   temp: Temperature!
 }
 
 type Temperature {
   celsius: Float!
   fahrenheit: Float!
+}
+
+type Speed {
+  meters_per_second: Float!
 }
