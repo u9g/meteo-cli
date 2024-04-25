@@ -72,8 +72,13 @@ pub(super) fn datapoint<'a>(
     );
 
     let query = format!(
-        "select {} FROM {tower_name} tbl HAVING {} LIMIT 1",
+        "select {} FROM {tower_name} tbl {}{} LIMIT 1",
         select_and_filter.select.iter().join(", "),
+        if !select_and_filter.filter.is_empty() {
+            "HAVING "
+        } else {
+            ""
+        },
         select_and_filter.filter.join(" AND ")
     );
     // println!("wind_speed_meters_per_second outputted: {:#?}",);
