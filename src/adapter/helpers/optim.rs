@@ -1,5 +1,10 @@
+use std::collections::HashSet;
+
 use itertools::Itertools;
-use trustfall::{provider::CandidateValue, FieldValue};
+use trustfall::{
+    provider::{CandidateValue, EdgeInfo},
+    FieldValue,
+};
 
 pub fn convert_field_value_to_string(field_value: &FieldValue) -> String {
     match field_value {
@@ -10,10 +15,15 @@ pub fn convert_field_value_to_string(field_value: &FieldValue) -> String {
     }
 }
 
+#[derive(Default, Debug)]
+pub struct SelectAndFilter {
+    pub select: HashSet<String>,
+    pub filter: Vec<String>,
+}
+
 pub fn filter_down_candidate_value_of_float(
     candidate_value: CandidateValue<FieldValue>,
-    select: &mut Vec<String>,
-    filter: &mut Vec<String>,
+    select_and_filter: &mut SelectAndFilter,
     name_of_outputted_field: &str,
     select_string: Option<String>,
 ) {
@@ -23,11 +33,13 @@ pub fn filter_down_candidate_value_of_float(
         trustfall::provider::CandidateValue::Impossible => {}
         trustfall::provider::CandidateValue::Single(single) => {
             let value_as_string = convert_field_value_to_string(&single);
-            filter.push(format!("{name_of_outputted_field} = {}", value_as_string));
-            select.push(select_string);
+            select_and_filter
+                .filter
+                .push(format!("{name_of_outputted_field} = {}", value_as_string));
+            select_and_filter.select.insert(select_string);
         }
         trustfall::provider::CandidateValue::Multiple(multiple) => {
-            filter.push(format!(
+            select_and_filter.filter.push(format!(
                 "({})",
                 multiple
                     .iter()
@@ -37,37 +49,60 @@ pub fn filter_down_candidate_value_of_float(
                     ))
                     .join(" OR ")
             ));
-            select.push(select_string);
+            select_and_filter.select.insert(select_string);
         }
         trustfall::provider::CandidateValue::Range(range) => {
             // range.
             match range.start_bound() {
-                std::ops::Bound::Included(included) => filter.push(format!(
+                std::ops::Bound::Included(included) => select_and_filter.filter.push(format!(
                     "{name_of_outputted_field} >= {}",
                     convert_field_value_to_string(included)
                 )),
-                std::ops::Bound::Excluded(excluded) => filter.push(format!(
+                std::ops::Bound::Excluded(excluded) => select_and_filter.filter.push(format!(
                     "{name_of_outputted_field} > {}",
                     convert_field_value_to_string(excluded)
                 )),
                 std::ops::Bound::Unbounded => {}
             }
             match range.end_bound() {
-                std::ops::Bound::Included(included) => filter.push(format!(
+                std::ops::Bound::Included(included) => select_and_filter.filter.push(format!(
                     "{name_of_outputted_field} <= {}",
                     convert_field_value_to_string(included)
                 )),
-                std::ops::Bound::Excluded(excluded) => filter.push(format!(
+                std::ops::Bound::Excluded(excluded) => select_and_filter.filter.push(format!(
                     "{name_of_outputted_field} < {}",
                     convert_field_value_to_string(excluded)
                 )),
                 std::ops::Bound::Unbounded => {}
             }
-            select.push(select_string);
+            select_and_filter.select.insert(select_string);
         }
         trustfall::provider::CandidateValue::All => {
-            select.push(select_string);
+            select_and_filter.select.insert(select_string);
         }
         _ => todo!(),
     }
+}
+
+pub fn filter_down_edge(
+    edges: &mut dyn Iterator<Item = EdgeInfo>,
+    filter_down_values: fn(EdgeInfo, &mut SelectAndFilter),
+    select_and_filter: &mut SelectAndFilter,
+) {
+    let mut filter = vec![];
+
+    edges
+        .map(|edge| {
+            let mut select_and_filter = SelectAndFilter::default();
+            filter_down_values(edge, &mut select_and_filter);
+            select_and_filter
+        })
+        .for_each(|x| {
+            select_and_filter.select.extend(x.select);
+            filter.push(format!("({})", x.filter.join(" AND ")));
+        });
+
+    select_and_filter
+        .filter
+        .push(format!("({})", filter.join(" OR ")));
 }
