@@ -1,5 +1,5 @@
 query {
-  Datapoint(tower_name: "CNT03") {
+  Datapoint(tower_name: "CNTR02") {
     time @output
     # wind_speed_meters_per_second @output
 
