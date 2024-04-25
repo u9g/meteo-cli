@@ -6,7 +6,7 @@ use crate::adapter::{
     vertex::Datapoint,
 };
 
-use super::{helpers::optim::convert_field_value_to_string, vertex::Vertex};
+use super::vertex::Vertex;
 
 pub(super) fn datapoint<'a>(
     tower_name: &str,

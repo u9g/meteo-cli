@@ -6,7 +6,17 @@ query {
       @filter(op: "one_of", value: ["$a19"])
       @filter(op: "<", value: ["$a20"])
     temp {
-      celsius @output
+      celsius
+        @output
+        @filter(op: "<", value: ["$_19"])
+        @filter(op: ">", value: ["$_15"])
+    }
+
+    temp {
+      c2: fahrenheit
+        @output
+        @filter(op: "<", value: ["$_35"])
+        @filter(op: ">", value: ["$_20"])
     }
   }
 }
