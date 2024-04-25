@@ -1,13 +1,6 @@
 use std::sync::{Arc, OnceLock};
 
-use trustfall::{
-    provider::{
-        resolve_coercion_using_schema, resolve_property_with, AsVertex, ContextIterator,
-        ContextOutcomeIterator, EdgeParameters, ResolveEdgeInfo, ResolveInfo, Typename,
-        VertexIterator,
-    },
-    FieldValue, Schema,
-};
+use trustfall::{FieldValue, Schema, provider::{AsVertex, ContextIterator, ContextOutcomeIterator, EdgeParameters, ResolveEdgeInfo, ResolveInfo, Typename, VertexIterator, resolve_coercion_using_schema, resolve_property_with}};
 
 use super::vertex::Vertex;
 
@@ -21,7 +14,10 @@ impl Adapter {
     pub const SCHEMA_TEXT: &'static str = include_str!("./schema.graphql");
 
     pub fn schema() -> &'static Schema {
-        SCHEMA.get_or_init(|| Schema::parse(Self::SCHEMA_TEXT).expect("not a valid schema"))
+        SCHEMA
+            .get_or_init(|| {
+                Schema::parse(Self::SCHEMA_TEXT).expect("not a valid schema")
+            })
     }
 
     pub fn new() -> Self {
@@ -39,17 +35,17 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
         resolve_info: &ResolveInfo,
     ) -> VertexIterator<'a, Self::Vertex> {
         match edge_name.as_ref() {
-            "AtTower" => {
+            "Datapoint" => {
                 let tower_name: &str = parameters
                     .get("tower_name")
                     .expect(
-                        "failed to find parameter 'tower_name' when resolving 'AtTower' starting vertices",
+                        "failed to find parameter 'tower_name' when resolving 'Datapoint' starting vertices",
                     )
                     .as_str()
                     .expect(
                         "unexpected null or other incorrect datatype for Trustfall type 'String!'",
                     );
-                super::entrypoints::at_tower(tower_name, resolve_info)
+                super::entrypoints::datapoint(tower_name, resolve_info)
             }
             _ => {
                 unreachable!(
@@ -70,11 +66,20 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
             return resolve_property_with(contexts, |vertex| vertex.typename().into());
         }
         match type_name.as_ref() {
-            "Datapoint" => super::properties::resolve_datapoint_property(
-                contexts,
-                property_name.as_ref(),
-                resolve_info,
-            ),
+            "Datapoint" => {
+                super::properties::resolve_datapoint_property(
+                    contexts,
+                    property_name.as_ref(),
+                    resolve_info,
+                )
+            }
+            "Temperature" => {
+                super::properties::resolve_temperature_property(
+                    contexts,
+                    property_name.as_ref(),
+                    resolve_info,
+                )
+            }
             _ => {
                 unreachable!(
                     "attempted to read property '{property_name}' on unexpected type: {type_name}"
@@ -92,12 +97,14 @@ impl<'a> trustfall::provider::Adapter<'a> for Adapter {
         resolve_info: &ResolveEdgeInfo,
     ) -> ContextOutcomeIterator<'a, V, VertexIterator<'a, Self::Vertex>> {
         match type_name.as_ref() {
-            "Tower" => super::edges::resolve_tower_edge(
-                contexts,
-                edge_name.as_ref(),
-                parameters,
-                resolve_info,
-            ),
+            "Datapoint" => {
+                super::edges::resolve_datapoint_edge(
+                    contexts,
+                    edge_name.as_ref(),
+                    parameters,
+                    resolve_info,
+                )
+            }
             _ => {
                 unreachable!(
                     "attempted to resolve edge '{edge_name}' on unexpected type: {type_name}"

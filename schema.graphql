@@ -43,17 +43,16 @@ directive @transform(
 All the possible data types where querying can begin in this API.
 """
 type RootSchemaQuery {
-  AtTower(tower_name: String!): Tower
-}
-
-type Tower {
-  # todo: add defaults
-  # interval_value: Int!, interval_unit: String!
-  Datapoint: Datapoint!
+  Datapoint(tower_name: String!): Datapoint
 }
 
 type Datapoint {
   time: String!
   wind_speed_meters_per_second: Float!
-  temp_celsius: Float!
+  temp: Temperature!
+}
+
+type Temperature {
+  celsius: Float!
+  fahrenheit: Float!
 }

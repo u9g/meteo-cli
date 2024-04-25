@@ -1,11 +1,11 @@
 query {
-  AtTower(tower_name: "my tower") {
-    datapoint {
-      time @output
-      wind_speed_meters_per_second
-        @output
-        @filter(op: ">", value: ["$wind_speed_filterer"])
-      temp_celsius @output
+  Datapoint(tower_name: "my tower") {
+    time @output
+    wind_speed_meters_per_second
+      @output
+      @filter(op: ">", value: ["$wind_speed_filterer"])
+    temp {
+      celsius @output
     }
   }
 }
