@@ -1,6 +1,6 @@
-use std::{collections::BTreeMap, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
-use trustfall::{execute_query, FieldValue, Schema};
+use trustfall::{execute_query, Schema, TransparentValue};
 
 use crate::adapter::Adapter;
 
@@ -11,20 +11,13 @@ fn main() {
     let adapter = Arc::new(Adapter::new());
 
     let query_results = execute_query(&schema, adapter, std::include_str!("../query.graphql"), {
-        let mut args: BTreeMap<Arc<str>, FieldValue> = BTreeMap::new();
-        // args.insert("wind_speed_filterer".into(), FieldValue::Float64(18.));
-        // args.insert(
-        //     "a19".into(),
-        //     FieldValue::List(vec![FieldValue::Float64(9.), FieldValue::Float64(10.)].into()),
-        // );
-        // args.insert("a20".into(), FieldValue::Float64(9.5));
-        // args.insert("_19".into(), FieldValue::Float64(19.));
-        // args.insert("_15".into(), FieldValue::Float64(15.));
-        // args.insert("_35".into(), FieldValue::Float64(35.));
-        args.insert("_50".into(), FieldValue::Float64(50.));
-        args.insert("_51".into(), FieldValue::Float64(51.));
-        // args.insert("_25".into(), FieldValue::Float64(25.));
-        args
+        let transparent_value: HashMap<Arc<str>, TransparentValue> =
+            serde_json::from_str(std::include_str!("../args.json")).unwrap();
+
+        transparent_value
+            .into_iter()
+            .map(|x| (x.0, x.1).into())
+            .collect()
     });
 
     let query_results_ran = query_results.unwrap().collect::<Vec<_>>();
